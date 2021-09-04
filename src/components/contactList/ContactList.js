@@ -1,26 +1,35 @@
 import PropTypes from 'prop-types';
+import s from './ContactList.module.css';
 
-function ContactList({ getVisibleContacts, deleteContact }) {
+const ContactList = ({ getContacts, deleteContactFromList }) => {
   return (
-    <ul>
-      {getVisibleContacts.map(contact => (
-        <li key={contact.id}>
-          {contact.name}: {contact.number}
-          <button type="submit" onClick={() => deleteContact(contact)}>
-            Delete
-          </button>
-        </li>
-      ))}
-    </ul>
+    <div className={s.container}>
+      <ul>
+        {getContacts.map(item => (
+          <li key={item.id} className={s.item}>
+            <span>
+              {item.name}: {item.number}
+            </span>
+            <button
+              className={s.btn}
+              type="submit"
+              onClick={() => deleteContactFromList(item)}
+            >
+              Delete
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
-}
+};
 
 ContactList.propTypes = {
-  getVisibleContacts: PropTypes.arrayOf(
+  getContacts: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.string,
-      name: PropTypes.string,
-      number: PropTypes.string,
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      number: PropTypes.string.isRequired,
     }),
   ),
 };

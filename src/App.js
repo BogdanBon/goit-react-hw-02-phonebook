@@ -1,63 +1,67 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import Notiflix from 'notiflix';
 import ContactForm from './components/contactForm/ContactForm';
 import FilterByName from './components/filter/FilterByName';
 import ContactList from './components/contactList/ContactList';
+import s from './App.module.css';
 
 class App extends Component {
   state = {
-    contacts: [],
+    contacts: [
+      { id: 'id-1', name: 'Denzel Hayes Washington Jr', number: '459-12-56' },
+      { id: 'id-2', name: 'Julia Roberts', number: '443-89-12' },
+      { id: 'id-3', name: 'Jennifer Aniston', number: '645-17-79' },
+      { id: 'id-4', name: 'Robert De Niro', number: '227-91-26' },
+    ],
     filter: '',
   };
 
-  filterList = e => {
+  nameFinder = e => {
     this.setState({
       filter: e.target.value,
     });
   };
 
-  formSubmitHandler = data => {
-    const findContacts = this.state.contacts.find(
+  handlerFormSubmit = data => {
+    const findSpecificContact = this.state.contacts.find(
       contact => contact.name === data.name,
     );
 
-    !findContacts
+    !findSpecificContact
       ? this.setState(prevState => ({
           contacts: [data, ...prevState.contacts],
         }))
-      : alert(`${data.name} is already in contacts.`);
+      : Notiflix.Notify.failure(
+          `Sorry, but user with name ${data.name} has already registered in contacts. Please specify your name!`,
+        );
   };
 
-  getVisibleList = () => {
-    const { filter, contacts } = this.state;
-    const normalizeFilter = filter.toLowerCase();
+  getContacts = () => {
+    const noramlizedDataInput = this.state.filter.toLowerCase();
 
-    return contacts.filter(contact =>
-      contact.name.toLowerCase().includes(normalizeFilter),
+    return this.state.contacts.filter(contact =>
+      contact.name.toLowerCase().includes(noramlizedDataInput),
     );
   };
 
-  deleteContact = data => {
+  deleteContactFromList = data => {
     return this.setState(prevState => ({
       contacts: prevState.contacts.filter(contact => contact.id !== data.id),
     }));
   };
 
   render() {
-    const { filter } = this.state;
-
-    const getVisibleContacts = this.getVisibleList();
-
     return (
-      <div>
-        <h1>Phonebook</h1>
-        <ContactForm formSubmitHandler={this.formSubmitHandler} />
+      <div className={s.container}>
+        <h1 className={s.title}>Phonebook</h1>
+        <ContactForm handlerFormSubmit={this.handlerFormSubmit} />
 
-        <h1>Contacts</h1>
-        <FilterByName filter={filter} filterList={this.filterList} />
+        <h2 className={s.title}>Contacts</h2>
+        <FilterByName filter={this.state.filter} nameFinder={this.nameFinder} />
         <ContactList
-          getVisibleContacts={getVisibleContacts}
-          deleteContact={this.deleteContact}
+          getContacts={this.getContacts()}
+          deleteContactFromList={this.deleteContactFromList}
         />
       </div>
     );
@@ -67,9 +71,9 @@ class App extends Component {
 App.propTypes = {
   contacts: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.number,
-      name: PropTypes.string,
-      number: PropTypes.string,
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      number: PropTypes.string.isRequired,
     }),
   ),
 };
